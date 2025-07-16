@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="manifest" href="manifest.json" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+  <title>Calcul Menu</title>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f4f6f8;
+      padding: 20px;
+      max-width: 700px;
+      margin: auto;
+      color: #333;
+    }
+    h2, h3 {
+      color: #222;
+    }
+    input, button {
+      padding: 10px;
+      margin: 6px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    button {
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+      border: none;
+    }
+    .menu-item {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+    .results {
+      margin-top: 20px;
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    ol {
+      padding-left: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Menu du Restaurant</h2>
+    <div id="menu"></div>
+    <button onclick="addMenuItem()">Ajouter un plat</button>
+  </div>
+
+  <div class="card">
+    <h3>Montant cible</h3>
+    <input type="number" id="target" placeholder="Montant en €" />
+    <br />
+    <button onclick="calculate()">Trouver les combinaisons</button>
+  </div>
+
+  <div class="card results" id="results"></div>
+
+  <script>
+    let menuData = [];
+
+    function addMenuItem(name = '', price = '') {
+      const container = document.getElementById('menu');
+      const itemDiv = document.createElement('div');
+      itemDiv.className = 'menu-item';
+
+      const nameInput = document.createElement('input');
+      nameInput.placeholder = 'Code (ex: M1)';
+      nameInput.value = name;
+
+      const priceInput = document.createElement('input');
+      priceInput.type = 'number';
+      priceInput.placeholder = 'Prix';
+      priceInput.value = price;
+
+      const removeBtn = document.createElement('button');
+      removeBtn.textContent = '❌';
+      removeBtn.onclick = () => container.removeChild(itemDiv);
+
+      itemDiv.appendChild(nameInput);
+      itemDiv.appendChild(priceInput);
+      itemDiv.appendChild(removeBtn);
+      container.appendChild(itemDiv);
+    }
+
+    function getMenuItems() {
+      const items = [];
+      const menuDivs = document.querySelectorAll('.menu-item');
+      for (const div of menuDivs) {
+        const inputs = div.querySelectorAll('input');
+        const name = inputs[0].value.trim();
+        const price = parseFloat(inputs[1].value);
+        if (name && !isNaN(price)) {
+          items.push({ code: name, price });
+        }
+      }
+      return items;
+    }
+
+    function calculate() {
+      const target = parseFloat(document.getElementById('target').value);
+      const menu = getMenuItems();
+      const results = [];
+
+      function search(currentCombo, total, index) {
+        if (total === target) {
+          results.push({ ...currentCombo });
+          return;
+        }
+        if (total > target) return;
+
+        for (let i = index; i < menu.length; i++) {
+          const item = menu[i];
+          currentCombo[item.code] = (currentCombo[item.code] || 0) + 1;
+          search(currentCombo, total + item.price, i);
+          currentCombo[item.code]--;
+          if (currentCombo[item.code] === 0) delete currentCombo[item.code];
+        }
+      }
+
+      search({}, 0, 0);
+
+      const resDiv = document.getElementById('results');
+      if (results.length === 0) {
+        resDiv.innerHTML = '<p>Aucune combinaison trouvée.</p>';
+      } else {
+        resDiv.innerHTML = '<ol>' + results
+          .map(r => `<li>${Object.entries(r).map(([k, v]) => `${k} * ${v}`).join(' + ')}</li>`)
+          .join('') + '</ol>';
+      }
+    }
+
+    // Ajoute quelques plats de démo au démarrage
+    addMenuItem('M1', 10);
+    addMenuItem('M2', 8);
+    addMenuItem('M3', 5);
+  </script>
+</body>
+</html>
