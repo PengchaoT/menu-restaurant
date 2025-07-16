@@ -61,7 +61,8 @@
   </style>
 </head>
 <body>
-  <div class="card">
+  <button onclick="toggleMenu()">Cacher / Afficher le menu</button>
+  <div class="card" id="menu-card">
     <h2>Menu du Restaurant</h2>
     <div id="menu"></div>
     <button onclick="addMenuItem()">Ajouter un plat</button>
@@ -172,9 +173,15 @@
       }
     }
 
+    function toggleMenu() {
+      const menuCard = document.getElementById('menu-card');
+      menuCard.style.display = menuCard.style.display === 'none' ? 'block' : 'none';
+    }
+
     window.onload = function () {
       loadMenuFromLocalStorage();
     };
   </script>
 </body>
 </html>
+
