@@ -95,12 +95,20 @@
 
       const removeBtn = document.createElement('button');
       removeBtn.textContent = '❌';
-      removeBtn.onclick = () => container.removeChild(itemDiv);
+      removeBtn.onclick = () => {
+        container.removeChild(itemDiv);
+        saveMenuToLocalStorage();
+      };
+
+      nameInput.oninput = saveMenuToLocalStorage;
+      priceInput.oninput = saveMenuToLocalStorage;
 
       itemDiv.appendChild(nameInput);
       itemDiv.appendChild(priceInput);
       itemDiv.appendChild(removeBtn);
       container.appendChild(itemDiv);
+
+      saveMenuToLocalStorage();
     }
 
     function getMenuItems() {
@@ -115,6 +123,20 @@
         }
       }
       return items;
+    }
+
+    function saveMenuToLocalStorage() {
+      const items = getMenuItems();
+      localStorage.setItem('menuData', JSON.stringify(items));
+    }
+
+    function loadMenuFromLocalStorage() {
+      const saved = localStorage.getItem('menuData');
+      if (saved) {
+        const items = JSON.parse(saved);
+        document.getElementById('menu').innerHTML = '';
+        items.forEach(item => addMenuItem(item.code, item.price));
+      }
     }
 
     function calculate() {
@@ -150,10 +172,9 @@
       }
     }
 
-    // Ajoute quelques plats de démo au démarrage
-    addMenuItem('M1', 10);
-    addMenuItem('M2', 8);
-    addMenuItem('M3', 5);
+    window.onload = function () {
+      loadMenuFromLocalStorage();
+    };
   </script>
 </body>
 </html>
