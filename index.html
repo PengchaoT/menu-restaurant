@@ -73,12 +73,7 @@
     <input type="number" id="target" placeholder="Montant en €" />
     <br />
     <label for="limit">Nombre maximum de résultats :</label>
-    <select id="limit">
-      <option value="1">1</option>
-      <option value="2">2</option>
-      <option value="5">5</option>
-      <option value="10" selected>10</option>
-    </select>
+    <select id="limit"></select>
     <br />
     <button onclick="calculate()">Trouver les combinaisons</button>
   </div>
@@ -173,12 +168,11 @@
       }
 
       search({}, 0, 0);
-
       const resDiv = document.getElementById('results');
       if (results.length === 0) {
         resDiv.innerHTML = '<p>Aucune combinaison trouvée.</p>';
       } else {
-        resDiv.innerHTML = '<ol>' + results
+        resDiv.innerHTML = `<p>Affichage de ${results.length} combinaison(s) :</p><ol>` + results
           .map(r => `<li>${Object.entries(r).map(([k, v]) => `${k} * ${v}`).join(' + ')}</li>`)
           .join('') + '</ol>';
       }
@@ -189,11 +183,21 @@
       menuCard.style.display = menuCard.style.display === 'none' ? 'block' : 'none';
     }
 
+    function populateLimitDropdown() {
+      const select = document.getElementById('limit');
+      for (let i = 1; i <= 10; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = i;
+        if (i === 10) option.selected = true;
+        select.appendChild(option);
+      }
+    }
+
     window.onload = function () {
       loadMenuFromLocalStorage();
+      populateLimitDropdown();
     };
   </script>
 </body>
 </html>
-
-
