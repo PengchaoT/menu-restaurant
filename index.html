@@ -19,7 +19,7 @@
     h2, h3 {
       color: #222;
     }
-    input, button {
+    input, button, select {
       padding: 10px;
       margin: 6px 0;
       border: 1px solid #ccc;
@@ -71,6 +71,14 @@
   <div class="card">
     <h3>Montant cible</h3>
     <input type="number" id="target" placeholder="Montant en €" />
+    <br />
+    <label for="limit">Nombre maximum de résultats :</label>
+    <select id="limit">
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="5">5</option>
+      <option value="10" selected>10</option>
+    </select>
     <br />
     <button onclick="calculate()">Trouver les combinaisons</button>
   </div>
@@ -142,10 +150,13 @@
 
     function calculate() {
       const target = parseFloat(document.getElementById('target').value);
+      const limit = parseInt(document.getElementById('limit').value);
       const menu = getMenuItems();
       const results = [];
 
       function search(currentCombo, total, index) {
+        if (results.length >= limit) return;
+
         if (total === target) {
           results.push({ ...currentCombo });
           return;
@@ -184,4 +195,5 @@
   </script>
 </body>
 </html>
+
 
